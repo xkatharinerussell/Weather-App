@@ -1,0 +1,343 @@
+#: import main main
+#: import ListAdapter kivy.adapters.listadapter.ListAdapter
+
+
+WeatherRoot:
+	Background:
+		##DisplayWeather
+		SettingsMainLayout
+		
+			
+<Background@BoxLayout>:
+	canvas.before:
+		Color:
+			rgba: 1, 1, 1, 1
+		Rectangle:
+			pos: self.pos
+			size: self.size
+
+
+<SettingsMainLayout@BoxLayout>:
+	orientation:"vertical"
+	MenuBox:
+		MenuButton1
+		MenuButton2
+		MenuButton3:
+			MenuSettingsButton
+	MainSettingsBox:
+		FindLocation
+		UserSettings
+			
+
+
+<MenuBox@BoxLayout>:
+	size_hint_y: 8
+	orientation: "horizontal"
+	padding: 0, 7, 0, 7
+	canvas.before:
+		Color:
+			rgba: 0, 0, 0, 1
+	
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	
+<MenuButton1@BoxLayout>: 
+	size_hint_x: 10
+	
+		
+<MenuButton2@BoxLayout>:
+	size_hint_x: 50
+	Label: 
+		text: "Weather It"
+		font_size: "25dp"
+		font_name: "Eurostile-Normal.ttf"
+		
+<MenuButton3@BoxLayout>:
+	size_hint_x: 8
+	padding: 7, 0, 7, 0
+	
+<MenuSettingsButton@Button>:
+	background_normal: "SettingsVector.png"
+	background_down: "SettingsVector.png"
+	border: 0, 0, 0, 0
+
+	
+		
+<MainSettingsBox@BoxLayout>:
+	orientation: "vertical"
+	size_hint_y: 85
+
+<FindLocation>:
+##Layout for the searchbox, search button and listview of countries
+	orientation: "vertical"
+	size_hint_y: 35
+	results: search_results_list
+	city_input: City
+	canvas.before:
+	    Color:
+	    	rgba: 0, 0, 0, 1
+	    Rectangle:
+	    	pos: self.pos
+            size: self.size
+
+	BoxLayout:
+		orientation: "horizontal"
+		size_hint_y: 30
+		spacing: 3
+		padding: 5, 5, 5, 8
+		Button:
+			text:"Your Location"
+			size_hint_x: 30
+			font_size: "13dp"
+			background_color: 0,0,0,1
+		    
+		TextInput:
+			size_hint_x: 40 
+			padding: 10, 0, 10, 10
+			id: City
+
+		Button:
+			size_hint_x: 30	
+			text: "Search"
+			background_color: 0,0,1,1
+			on_press: root.click_search()
+	
+	ListView:
+		size_hint_y: 60
+		padding: 30, 5, 20, 0
+		background_color: 0, 1, 0, 1
+		id: search_results_list
+		adapter:
+			ListAdapter(data=[], cls=main.LocationButton, args_converter=root.args_converter)
+
+<LocationButton>:
+	size_hint_x: 30
+	size_hint_y: 10
+	text: "{} ({})".format(self.location[0], self.location[1])
+	on_press:app.root.define_location(self.location)
+	deselected_color: 0,0,0,1
+	selected_color: 0,0,1,1
+	row_height: '10'
+
+<UserSettings@BoxLayout>:
+	orientation: "vertical"
+	size_hint_y: 60
+	userage: AgeInput
+
+	BoxLayout: 
+	## row that displays age label and text input
+		orientation: "horizontal"
+		padding: 40, 10, 40, 10
+		spacing: 20
+		size_hint_y: 10
+		Button:
+			text: "Age"
+			size_hint_x: 30
+			background_color: 0,0,0,1
+
+		TextInput:
+			size_hint_x: 40
+			id: AgeInput
+
+	BoxLayout: 
+	## row that displays the gender and checkboxes
+		orientation: "horizontal"
+		padding: 40, 10, 40, 10
+		size_hint_y: 10
+		Button:
+			size_hint_x: 23
+			text: "Gender"
+			background_color: 0,0,0,1
+		Label:
+			size_hint_x: 5
+
+		Label:
+			size_hint_x: 5
+			text: "M"
+			color: 0, 0, 0, 1
+
+		CheckBox:
+			size_hint_x: 10
+			group: "gender"
+			background_color: 0,0,0,1
+			id: Male
+			on_active: app.root.set_gender(self, 'Male')
+
+		Label:
+			size_hint_x: 5
+			text: "F"
+			color: 0, 0, 0, 1
+
+		CheckBox:
+			size_hint_x: 10
+			group: "gender"
+			background_color: 0,0,0,1
+			id: Female
+			on_active: app.root.set_gender(self, 'Female')
+
+	BoxLayout:
+	##row that displays the unit and checkboxes
+		orientation: "horizontal"
+		padding: 40, 10, 40, 10
+		size_hint_y: 10
+		Button:
+			size_hint_x: 23
+			text: "Unit"
+			background_color: 0,0,0,1
+		Label:
+			size_hint_x: 5
+
+		Label:
+			size_hint_x: 5
+			text: "C"
+			color: 0, 0, 0, 1
+
+		CheckBox:
+			size_hint_x: 10
+			group: "Unit"
+			on_active: app.root.set_unit(self, 'Celsius')
+			
+		Label:
+			size_hint_x: 5
+			text: "F"
+			color: 0, 0, 0, 1
+
+		CheckBox:
+			size_hint_x: 10
+			group: "Unit"
+			on_active: app.root.set_unit(self, 'Farenheit')
+		
+
+	BoxLayout:
+	##Save button
+		size_hint_y: 25
+		padding: 100, 30, 100, 50
+
+		Button:
+			text: "Save"
+			background_color: 0,0,0,1
+			id: SaveSettings
+			on_press: app.root.click_ok(age=AgeInput.text), app.root.click_to_display(), ##app.root.update_weather()
+
+
+<DisplayWeather>:
+	location: ""
+	temp: ""
+	temp_min: ""
+	temp_max: ""
+	humidity: ""
+	rain: ""
+	outfit: ""
+	
+	orientation: "vertical"
+	canvas.before:
+	    Color:
+	    	rgba: 1, 1, 1, 1
+	    Rectangle:
+	    	pos: self.pos
+            size: self.size
+	MenuBox:
+		MenuButton1
+		MenuButton2
+		MenuButton3:
+			MenuSettingsButton
+
+	BoxLayout:
+	## WeatherBox1
+		orientation: "horizontal"
+		size_hint_y: 10
+		padding: 10, 0, 10, 0
+		canvas.before:
+		    Color:
+		    	rgba: 0.5, 0.5, 0.5, 0.1
+		    Rectangle:
+		    	pos: self.pos
+	            size: self.size
+		Label:
+		##current temperature
+			font_size: "40dp"
+			size_hint_x: 20
+			color: 0, 0, 0, 1
+			text:"{}".format(root.temperature)+ "C"
+			
+			
+		Button: 
+		##weather icon
+			size_hint_x: 10
+		Label:
+		##Max and Min temperature
+			size_hint_x: 15
+			font_size: "13dp"
+			color: 0, 0, 0, 1
+			text:"Max: {}C\nMin: {}C".format(root.temp_max, root.temp_min)
+			
+	BoxLayout:
+	##WeatherBox2
+		orientation: "horizontal"
+		size_hint_y: 10
+		padding: 10, 0, 10, 0
+		canvas.before:
+		    Color:
+		    	rgba: 0.5, 0.5, 0.5, 0.1
+		    Rectangle:
+		    	pos: self.pos
+	            size: self.size
+
+		Label:
+		##city and country
+			size_hint_x: 20
+			valign: "top"
+			color: 0, 0, 0, 1
+			text: "{} ({})".format(app.root.current_location[0],app.root.current_location[1])
+
+	
+		Image:
+		##Icons for humudity, rain and wind
+			source: "Humidity.png"
+			size_hint_x: 5
+	
+		Label:
+		##info for humidity,rain and wind
+			size_hint_x: 30
+			text: "Humidity: {}\nRain:{}\nWind:  {}".format(root.humidity,root.rain,root.wind)
+			font_size: "13dp"
+			##font_name: "Helvetica Neue UltraLight.ttf"
+			color: 0, 0, 0, 1
+
+	BoxLayout:
+	##WeatherBox3
+		size_hint_y: 60
+		canvas.before:
+			Color:
+				rgba: 0.5, 0, 0.5, 1
+		Image:
+			source: "root.outfit"
+		
+		
+		##Carousel:
+			##direction: "right"
+			
+<Saved_Settings_Message@BoxLayout>:
+	orientation: "vertical"
+	
+	Label:
+		text: "Your Settings have been saved!"
+		
+	Button:
+		text: "Get Outfit"
+		on_press: app.root.Display_Weather() ##app.root.Test()
+			
+
+
+		
+
+
+
+
+
+
+
+
+
+	
